@@ -1,0 +1,13 @@
+# build results & output directories
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+publish/
+dist/
+build_temp
+
+# IDE
+.vs/
+.idea/
+.zed/
