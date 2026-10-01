@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/PortSweep.Core/PortSweep.Core.csproj" />
+  <Project Path="src/PortSweep.Desktop/PortSweep.Desktop.csproj" />
+</Solution>

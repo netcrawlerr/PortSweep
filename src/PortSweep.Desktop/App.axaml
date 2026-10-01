@@ -1,0 +1,123 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:PortSweep.Desktop"
+             x:Class="PortSweep.Desktop.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <!-- dark Monochrome -->
+        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#09090b"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#18181b"/>
+        <SolidColorBrush x:Key="BorderZincBrush" Color="#27272a"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#fafafa"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#a1a1aa"/>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- Primary Monochrome Button -->
+        <Style Selector="Button.portsweep-btn">
+            <Setter Property="Background" Value="#18181b"/>
+            <Setter Property="Foreground" Value="#fafafa"/>
+            <Setter Property="BorderBrush" Value="#27272a"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style Selector="Button.portsweep-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#27272a"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
+        </Style>
+
+        <!-- Primary Accent Button -->
+        <Style Selector="Button.portsweep-btn-primary">
+            <Setter Property="Background" Value="#fafafa"/>
+            <Setter Property="Foreground" Value="#09090b"/>
+            <Setter Property="BorderBrush" Value="#ffffff"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style Selector="Button.portsweep-btn-primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#e4e4e7"/>
+            <Setter Property="Foreground" Value="#09090b"/>
+        </Style>
+
+        <!-- Monochrome Destructive Button -->
+        <Style Selector="Button.portsweep-btn-danger">
+            <Setter Property="Background" Value="#27272a"/>
+            <Setter Property="Foreground" Value="#f43f5e"/>
+            <Setter Property="BorderBrush" Value="#3f3f46"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style Selector="Button.portsweep-btn-danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#3f3f46"/>
+            <Setter Property="Foreground" Value="#fb7185"/>
+        </Style>
+
+        <!-- portsweep Input Field -->
+        <Style Selector="TextBox.portsweep-input">
+            <Setter Property="Background" Value="#18181b"/>
+            <Setter Property="Foreground" Value="#fafafa"/>
+            <Setter Property="BorderBrush" Value="#27272a"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="10,7"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style Selector="TextBox.portsweep-input:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#fafafa"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- ListBox Row Customization -->
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#27272a"/>
+        </Style>
+
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#18181b"/>
+            <Setter Property="BorderBrush" Value="#52525b"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Application.Styles>
+
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/logo.png" ToolTipText="PortSweep 🧹">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Open PortSweep" Click="OnOpenWindowClicked"/>
+                        <NativeMenuItem Header="Refresh Active Sockets" Click="OnRefreshClicked"/>
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Exit" Click="OnExitClicked"/>
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
+</Application>

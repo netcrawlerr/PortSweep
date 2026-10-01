@@ -1,0 +1,127 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PortSweep.Desktop.ViewModels"
+        x:Class="PortSweep.Desktop.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="PortSweep" Height="680" Width="1080"
+        Icon="/Assets/logo.png"
+        WindowStartupLocation="CenterScreen"
+        Background="#09090b" Foreground="#fafafa">
+
+    <Grid RowDefinitions="Auto, *, Auto" Margin="24">
+
+        <!-- header -->
+        <StackPanel Grid.Row="0" Spacing="16" Margin="0,0,0,20">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <!-- icon and shi -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <Border Width="44" Height="44"
+                            CornerRadius="22"
+                            Background="#18181b"
+                            BorderBrush="#27272a"
+                            BorderThickness="1"
+                            ClipToBounds="True">
+                        <Image Source="/Assets/logo.png"
+                               Width="44"
+                               Height="44"
+                               Stretch="UniformToFill"
+                               RenderOptions.BitmapInterpolationMode="HighQuality"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="PortSweep" FontSize="18" FontWeight="Bold" Foreground="#fafafa"/>
+                        <TextBlock Text="Active Port Manager" FontSize="12" Foreground="#a1a1aa"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- btns -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+                    <Button Classes="portsweep-btn-primary" Command="{Binding RefreshAsync}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="↻" FontWeight="Bold"/>
+                            <TextBlock Text="Refresh"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="portsweep-btn" Command="{Binding TerminateSelectedAsync}">
+                        <TextBlock Text="TERMINATE"/>
+                    </Button>
+                    <Button Classes="portsweep-btn-danger" Command="{Binding ForceKillSelectedAsync}">
+                        <TextBlock Text="KILL"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- input -->
+            <Border Background="#18181b" BorderBrush="#27272a" BorderThickness="1" CornerRadius="8" Padding="4">
+                <Grid ColumnDefinitions="Auto, *">
+                    <TextBlock Grid.Column="0" Text="🔍" Margin="12,0,8,0" VerticalAlignment="Center" Foreground="#71717a"/>
+                    <TextBox Grid.Column="1"
+                             Classes="portsweep-input"
+                             Text="{Binding SearchFilter, Mode=TwoWay}"
+                             Watermark="Filter sockets by Port, Process Name, PID, or Directory..."
+                             BorderThickness="0"
+                             Background="Transparent"/>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- data table -->
+        <Border Grid.Row="1" Background="#18181b" BorderBrush="#27272a" BorderThickness="1" CornerRadius="8" Padding="12">
+            <Grid RowDefinitions="Auto, *">
+                <!-- headers -->
+                <Border Grid.Row="0" Background="#27272a" CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="80, 80, 90, 160, 100, *">
+                        <TextBlock Grid.Column="0" Text="PORT" FontSize="11" FontWeight="Bold" Foreground="#a1a1aa"/>
+                        <TextBlock Grid.Column="1" Text="PROTO" FontSize="11" FontWeight="Bold" Foreground="#a1a1aa"/>
+                        <TextBlock Grid.Column="2" Text="PID" FontSize="11" FontWeight="Bold" Foreground="#a1a1aa"/>
+                        <TextBlock Grid.Column="3" Text="PROCESS" FontSize="11" FontWeight="Bold" Foreground="#a1a1aa"/>
+                        <TextBlock Grid.Column="4" Text="MEMORY" FontSize="11" FontWeight="Bold" Foreground="#a1a1aa"/>
+                        <TextBlock Grid.Column="5" Text="WORKING DIRECTORY / COMMAND" FontSize="11" FontWeight="Bold" Foreground="#a1a1aa"/>
+                    </Grid>
+                </Border>
+
+                <!-- ps list -->
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding FilteredItems}"
+                         SelectedItem="{Binding SelectedItem}"
+                         Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="vm:ProcessItemViewModel">
+                            <Border BorderBrush="#27272a" BorderThickness="0,0,0,1" Padding="12,10">
+                                <Grid ColumnDefinitions="80, 80, 90, 160, 100, *">
+                                    <Border Grid.Column="0" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding Port}" FontWeight="Bold" Foreground="#fafafa" FontSize="12"/>
+                                    </Border>
+
+                                    <TextBlock Grid.Column="1" Text="{Binding Protocol}" Foreground="#a1a1aa" VerticalAlignment="Center" FontSize="12"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Pid}" Foreground="#e4e4e7" VerticalAlignment="Center" FontSize="12"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding ProcessName}" FontWeight="SemiBold" Foreground="#fafafa" VerticalAlignment="Center" FontSize="13"/>
+                                    <TextBlock Grid.Column="4" Text="{Binding DisplayMemory}" Foreground="#a1a1aa" VerticalAlignment="Center" FontSize="12"/>
+
+                                    <StackPanel Grid.Column="5" VerticalAlignment="Center" Spacing="2">
+                                        <TextBlock Text="{Binding WorkingDirectory}" Foreground="#d4d4d8" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding CommandLine}" Foreground="#71717a" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <!-- ftr -->
+        <Border Grid.Row="2" Margin="0,16,0,0">
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Border Width="8" Height="8" CornerRadius="4" Background="#fafafa" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="#a1a1aa" FontSize="12"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{Binding FilteredItems.Count, StringFormat='Showing {0} processes'}" Foreground="#71717a" FontSize="12"/>
+                    <TextBlock Text="{Binding TotalListenersCount, StringFormat='Total Listeners: {0}'}" Foreground="#fafafa" FontSize="12" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
