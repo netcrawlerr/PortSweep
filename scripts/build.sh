@@ -4,7 +4,7 @@ set -e
 
 APP_NAME="PortSweep"
 LOWER_APP_NAME="portsweep"
-VERSION="${1:-1.0.0}"
+VERSION="${1:-1.0.1}"
 TARGET_FRAMEWORK="net10.0"
 RID="linux-x64"
 
@@ -25,7 +25,6 @@ trap cleanup EXIT
 echo "=========================================="
 echo " Building ${APP_NAME} v${VERSION} for Linux (${RID})"
 echo "=========================================="
-
 
 rm -rf "${DIST_DIR}"
 mkdir -p "${DIST_DIR}" "${PUBLISH_DIR}"
@@ -55,7 +54,6 @@ mkdir -p "${DEB_ROOT}/usr/bin"
 mkdir -p "${DEB_ROOT}/usr/share/applications"
 mkdir -p "${DEB_ROOT}/usr/share/icons/hicolor/512x512/apps"
 mkdir -p "${DEB_ROOT}/DEBIAN"
-
 
 cp -r "${PUBLISH_DIR}/"* "${DEB_OPT_DIR}/"
 
@@ -93,7 +91,7 @@ EOF
 
 if command -v dpkg-deb &> /dev/null; then
   DEB_FILE="${DIST_DIR}/${LOWER_APP_NAME}_${VERSION}_amd64.deb"
-  dpkg-deb --build "${DEB_ROOT}" "${DEB_FILE}"
+  dpkg-deb --root-owner-group --build "${DEB_ROOT}" "${DEB_FILE}"
   echo "  -> Created ${DEB_FILE}"
 else
   echo "  [Skipped] 'dpkg-deb' is not installed."
@@ -105,16 +103,13 @@ APPDIR="${WORK_DIR}/AppDir"
 mkdir -p "${APPDIR}/usr/bin"
 mkdir -p "${APPDIR}/usr/share/icons/hicolor/512x512/apps"
 
-
 cp -r "${PUBLISH_DIR}/"* "${APPDIR}/usr/bin/"
-
 
 if [ -f "${ICON_SRC}" ]; then
   cp "${ICON_SRC}" "${APPDIR}/usr/share/icons/hicolor/512x512/apps/${LOWER_APP_NAME}.png"
   cp "${ICON_SRC}" "${APPDIR}/${LOWER_APP_NAME}.png"
   cp "${ICON_SRC}" "${APPDIR}/.DirIcon"
 fi
-
 
 cat <<EOF > "${APPDIR}/${LOWER_APP_NAME}.desktop"
 [Desktop Entry]
@@ -127,7 +122,6 @@ Type=Application
 Categories=Utility;System;Network;
 EOF
 
-
 cat <<'EOF' > "${APPDIR}/AppRun"
 #!/usr/bin/env bash
 HERE="$(dirname "$(readlink -f "${0}")")"
@@ -136,31 +130,26 @@ exec "${HERE}/usr/bin/PortSweep.Desktop" "$@"
 EOF
 chmod +x "${APPDIR}/AppRun"
 
+APPIMAGE_FILE="${DIST_DIR}/${APP_NAME}-${VERSION}-x86_64.AppImage"
 
-APPIMAGE_TOOL=""
-
-if command -v appimagetool &> /dev/null; then
-  APPIMAGE_TOOL="appimagetool"
+# Download and extract appimagetool to bypass FUSE (libfuse.so.2) requirement on modern Linux
+LOCAL_TOOL="${WORK_DIR}/appimagetool"
+if command -v curl &> /dev/null; then
+  curl -sSL -o "${LOCAL_TOOL}" "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+elif command -v wget &> /dev/null; then
+  wget -q -O "${LOCAL_TOOL}" "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 else
-  echo "  -> 'appimagetool' not found in PATH. Downloading to system temp..."
-  TOOL_URL="https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-  LOCAL_TOOL="${WORK_DIR}/appimagetool"
-
-  if command -v curl &> /dev/null; then
-    curl -sSL -o "${LOCAL_TOOL}" "${TOOL_URL}"
-  elif command -v wget &> /dev/null; then
-    wget -q -O "${LOCAL_TOOL}" "${TOOL_URL}"
-  else
-    echo "  [Error] Neither curl nor wget found. Cannot download appimagetool."
-    exit 1
-  fi
-
-  chmod +x "${LOCAL_TOOL}"
-  APPIMAGE_TOOL="${LOCAL_TOOL}"
+  echo "  [Error] Neither curl nor wget found. Cannot download appimagetool."
+  exit 1
 fi
 
-APPIMAGE_FILE="${DIST_DIR}/${APP_NAME}-${VERSION}-x86_64.AppImage"
-ARCH=x86_64 "${APPIMAGE_TOOL}" "${APPDIR}" "${APPIMAGE_FILE}"
+chmod +x "${LOCAL_TOOL}"
+
+cd "${WORK_DIR}"
+./appimagetool --appimage-extract > /dev/null
+EXTRACTED_TOOL="${WORK_DIR}/squashfs-root/AppRun"
+
+ARCH=x86_64 "${EXTRACTED_TOOL}" "${APPDIR}" "${APPIMAGE_FILE}"
 echo "  -> Created ${APPIMAGE_FILE}"
 
 # ---------------------------------------------------------
